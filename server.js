@@ -19,24 +19,25 @@ const server = http.createServer((req, res) => {
         const fileExt = path.extname(filePath);
 
         if (fileExt === '.html') {
-            fs.access(filePath, err => {
+            fs.access(filePath, err => { //checks if a file is accessible
                 if (err) {
                     res.statusCode = 404;
-                    res.setHeader('Content-Type', 'text/html');
+                    res.setHeader('Content-Type', 'text/html'); //Tells the client to expect an HTML file.
                     res.end(`<html><body><h1>Error 404: ${fileUrl} not found</h1></body></html>`);
                     return;
                 }
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'text/html');
 
-                fs.createReadStream(filePath).pipe(res);
+                fs.createReadStream(filePath).pipe(res); //This method takes care of reading the contents of the file it’s given in small chunks, instead of all at once. So it doesn’t load it all into memory. .pipe(res) means we are sending it over to the response object. 
+                //Pipe method is available on Node streams. The response object is a special type of object called a stream. createReadStream also creates a stream. When you have two stream objects, you can use the pipe method to send one stream to another. We are piping the data to the response stream here.
             });
-        } else {
+        } else { //if the fileExt is not html:
             res.statusCode = 404;
             res.setHeader('Content-Type', 'text/html');
             res.end(`<html><body><h1>Error 404: ${fileUrl} is not an HTML file</h1></body></html>`);
         }
-    } else {
+    } else { //request type invalid.
         res.statusCode = 404;
         res.setHeader('Content-Type', 'text/html');
         res.end(`<html><body><h1>Error 404: ${req.method} not supported</h1></body></html>`);
